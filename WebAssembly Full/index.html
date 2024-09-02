@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebAssembly Prime Number Finder</title>
+</head>
+<body>
+    <h1>Prime Number Finder with WebAssembly</h1>
+    <p>Enter the range to find prime numbers:</p>
+    <input type="number" id="limit" placeholder="Enter limit">
+    <button id="calculate-btn">Calculate Primes</button>
+    
+    <h2>Prime Numbers:</h2>
+    <div id="output"></div>
+
+    <script src="primes.js"></script>
+    <script>
+        // Wait for the WebAssembly to be ready
+        Module.onRuntimeInitialized = function() {
+            const sieve_of_eratosthenes = Module.cwrap('sieve_of_eratosthenes', 'number', ['number']);
+            
+            document.getElementById('calculate-btn').addEventListener('click', () => {
+                const limit = parseInt(document.getElementById('limit').value);
+                const primesPointer = sieve_of_eratosthenes(limit);
+                
+                let primes = [];
+                for (let i = 2; i <= limit; i++) {
+                    if (Module.HEAPU8[primesPointer + i]) {
+                        primes.push(i);
+                    }
+                }
+
+                document.getElementById('output').textContent = `Found ${primes.length} primes up to ${limit}: ${primes.join(', ')}`;
+                
+                // Free the allocated memory
+                Module._free(primesPointer);
+            });
+        };
+    </script>
+</body>
+</html>

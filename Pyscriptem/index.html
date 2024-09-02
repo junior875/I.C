@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prime Number Finder</title>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css">
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+</head>
+<body>
+    <h1>Prime Number Finder</h1>
+    <p>Enter the range to find prime numbers:</p>
+    <input type="number" id="limit" placeholder="Enter limit">
+    <button id="calculate-btn">Calculate Primes</button>
+    
+    <h2>Prime Numbers:</h2>
+    <div id="output"></div>
+
+    <py-script>
+        def sieve_of_eratosthenes(limit):
+            primes = [True] * (limit + 1)
+            p = 2
+            while (p ** 2 <= limit):
+                if (primes[p]):
+                    for i in range(p * p, limit + 1, p):
+                        primes[i] = False
+                p += 1
+            return [p for p in range(2, limit) if primes[p]]
+
+        def calculate_primes(*args):
+            limit_input = Element("limit").value
+            if limit_input.isnumeric():
+                limit = int(limit_input)
+                if limit > 1:
+                    prime_numbers = sieve_of_eratosthenes(limit)
+                    output_element = Element("output")
+                    output_element.write(f"Found {len(prime_numbers)} primes up to {limit}:")
+                    output_element.write(", ".join(map(str, prime_numbers)))
+                else:
+                    Element("output").write("Please enter a number greater than 1.")
+            else:
+                Element("output").write("Please enter a valid number.")
+
+        calculate_btn = Element("calculate-btn")
+        calculate_btn.element.onclick = calculate_primes
+    </py-script>
+</body>
+</html>
